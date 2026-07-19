@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SOOQGO</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #1B3A6B, #10264A);
+      color: #fff; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 24px;
+    }
+    .box { max-width: 360px; width: 100%; }
+    .logo { font-size: 40px; font-weight: 900; letter-spacing: 1px; margin-bottom: 18px; }
+    .logo span { color: #FCD34D; }
+    p { font-size: 16px; line-height: 1.7; opacity: 0.9; margin-bottom: 24px; }
+    .btn {
+      display: inline-block; background: #FCD34D; color: #10264A;
+      font-size: 16px; font-weight: 800; text-decoration: none;
+      padding: 14px 28px; border-radius: 14px;
+    }
+    .spinner {
+      width: 34px; height: 34px; margin: 0 auto 22px;
+      border: 3px solid rgba(255,255,255,0.25); border-top-color: #FCD34D;
+      border-radius: 50%; animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="logo">SOOQ<span>GO</span></div>
+    <div class="spinner"></div>
+    <p>جاري فتح القطعة في تطبيق سوق قو…<br>Opening in the SOOQGO app…</p>
+    <a class="btn" id="store" href="https://play.google.com/store/apps/details?id=ae.sooqgo.app">
+      تحميل التطبيق · Get the app
+    </a>
+  </div>
+  <script>
+    (function () {
+      var STORE = 'https://play.google.com/store/apps/details?id=ae.sooqgo.app';
+      var id = new URLSearchParams(location.search).get('id') || '';
+      if (!id) { location.replace(STORE); return; }
+
+      var isAndroid = /android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        // Android Chrome: intent:// opens the app if installed, otherwise
+        // uses the built-in Play Store fallback — no timers needed.
+        location.replace(
+          'intent://part/' + encodeURIComponent(id) +
+          '#Intent;scheme=sooqgo;package=ae.sooqgo.app;S.browser_fallback_url=' +
+          encodeURIComponent(STORE) + ';end');
+        return;
+      }
+
+      // iOS / desktop: try the custom scheme, fall back to the store if the
+      // app doesn't take over within 1.5s.
+      var opened = false;
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) opened = true;
+      });
+      window.location = 'sooqgo://part/' + encodeURIComponent(id);
+      setTimeout(function () { if (!opened) location.replace(STORE); }, 1500);
+    })();
+  </script>
+</body>
+</html>
